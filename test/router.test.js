@@ -182,6 +182,50 @@ describe('router', () => {
       // The body is removed in cloudflare and the correct content-length headers set.
       expect(body).to.equal('test');
     });
+
+    it('should serve static html', async () => {
+      const router = new Router();
+      router.use(responseUtils.serveStatic).get('/', (ctx, next) => {
+        ctx.body = 'hello';
+      });
+
+      const request = {
+        url: 'http://foo.example.com/dummy.html',
+        method: constants.methods.GET,
+        headers: new Map(),
+      };
+
+      const response = await router.resolve({
+        request,
+      });
+
+      const body = await responseUtils.getBodyText(response.body);
+
+      expect(body).to.equal('<p>this is static html</p>');
+      expect(response.status).to.equal(200);
+    });
+
+    it('should fallback to a 404 response if an asset is not found', async () => {
+      const router = new Router();
+      router.use(responseUtils.serveStatic).get('/', (ctx, next) => {
+        ctx.body = 'hello';
+      });
+
+      const request = {
+        url: 'http://foo.example.com/dummy.js',
+        method: constants.methods.GET,
+        headers: new Map(),
+      };
+
+      const response = await router.resolve({
+        request,
+      });
+
+      const body = await responseUtils.getBodyText(response.body);
+
+      expect(body).to.equal('');
+      expect(response.status).to.equal(404);
+    });
   });
 
   describe('router path matching', () => {
@@ -500,24 +544,5 @@ describe('router header matching', () => {
     });
 
     expect(response.status).to.equal(404);
-  });
-
-  it('should serve static html', async () => {
-    const router = new Router();
-    router.use(responseUtils.serveStatic);
-
-    const request = {
-      url: 'http://foo.example.com/dummy.html',
-      method: constants.methods.GET,
-      headers: new Map(),
-    };
-
-    const response = await router.resolve({
-      request,
-    });
-
-    const body = await responseUtils.getBodyText(response.body)
-
-    expect(body).to.equal('<p>this is static html</p>');
   });
 });

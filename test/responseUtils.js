@@ -29,7 +29,12 @@ async function serveStatic(ctx, next) {
   } else if (!(ctx.body == null || ctx.status === 404)) {
     return;
   } else {
-    ctx.body = `<p>this is static html</p>`;
+    if (ctx.request.path.includes('dummy.html')) {
+      ctx.body = `<p>this is static html</p>`;
+      ctx.status = 200;
+    } else {
+      ctx.status = 404;
+    }
   }
 }
 

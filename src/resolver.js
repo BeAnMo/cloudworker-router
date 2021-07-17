@@ -59,30 +59,47 @@ function matchRoutePaths(request, routes) {
   );
 }
 
+function dispatcher(ctx, routes) {
+  const len = routes.length;
+  let index = -1;
+
+  const dispatch = (i) => {
+    if (i <= index) {
+      throw new Error('next() called multiples.');
+    } else {
+      index = i;
+    }
+
+    if (i === len) {
+      // eslint-disable-next-line
+      return new Response('NOT_FOUND', {
+        status: 404,
+      });
+    }
+
+    const route = routes[i];
+
+    if (!testPath(route, ctx.request)) {
+      return dispatch(i + 1);
+    }
+    ctx.state.handlers = ctx.state.handlers || [];
+    // Use the provided name and fall back to the name of the function
+    ctx.state.handlers.push(route.handlerName || route.handler.name);
+    ctx.params = getParams(ctx.request, route);
+
+    try {
+      return route.handler(ctx, dispatch.bind(null, i + 1));
+    } catch (err) {
+      err.route = route.handler.name;
+      throw err;
+    }
+  };
+
+  return dispatch(0);
+}
+
 async function recurseRoutes(ctx, routes) {
-  const [route, ...nextRoutes] = routes;
-  if (!route) {
-    // eslint-disable-next-line
-    return new Response('NOT_FOUND', {
-      status: 404,
-    });
-  }
-
-  if (!testPath(route, ctx.request)) {
-    return recurseRoutes(ctx, nextRoutes);
-  }
-
-  ctx.state.handlers = ctx.state.handlers || [];
-  // Use the provided name and fall back to the name of the function
-  ctx.state.handlers.push(route.handlerName || route.handler.name);
-  ctx.params = getParams(ctx.request, route);
-
-  try {
-    return route.handler(ctx, async (result) => recurseRoutes(result, nextRoutes));
-  } catch (err) {
-    err.route = route.handler.name;
-    throw err;
-  }
+  return dispatcher(ctx, routes);
 }
 
 module.exports = {

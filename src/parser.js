@@ -130,9 +130,7 @@ function parseRequest(request) {
     query,
     querystring: url.search.slice(1),
     search: url.search,
-    text: async (maxSize) => {
-      return getBodyText(maxSize);
-    },
+    text: async (maxSize) => getBodyText(maxSize),
   };
 }
 module.exports = {

@@ -16,6 +16,8 @@ module.exports = class Router {
     });
 
     this.routes.push(route);
+
+    return this;
   }
 
   options(path, handler) {
@@ -26,6 +28,8 @@ module.exports = class Router {
     });
 
     this.routes.push(route);
+
+    return this;
   }
 
   post(path, handler) {
@@ -36,6 +40,8 @@ module.exports = class Router {
     });
 
     this.routes.push(route);
+
+    return this;
   }
 
   patch(path, handler) {
@@ -46,6 +52,8 @@ module.exports = class Router {
     });
 
     this.routes.push(route);
+
+    return this;
   }
 
   del(path, handler) {
@@ -56,6 +64,8 @@ module.exports = class Router {
     });
 
     this.routes.push(route);
+
+    return this;
   }
 
   allowMethods() {
@@ -74,6 +84,8 @@ module.exports = class Router {
       ctx.status = 204;
       ctx.set('Access-Control-Allow-Method', Object.keys(headers).join(', '));
     });
+
+    return this;
   }
 
   /**
@@ -89,6 +101,8 @@ module.exports = class Router {
     });
 
     this.routes.push(route);
+
+    return this;
   }
 
   /**
@@ -109,6 +123,8 @@ module.exports = class Router {
     });
 
     this.routes.push(route);
+
+    return this;
   }
 
   /**

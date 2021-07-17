@@ -159,15 +159,15 @@ describe('router', () => {
     it('should route all requests to a middleware', async () => {
       const router = new Router();
 
-      router.use(async (ctx, next) => {
-        ctx.set('foo', 'bar');
-        next(ctx);
-      });
-
-      router.get('/', async (ctx) => {
-        ctx.body = 'test';
-        ctx.status = 200;
-      });
+      router
+        .use(async (ctx, next) => {
+          ctx.set('foo', 'bar');
+          next(ctx);
+        })
+        .get('/', async (ctx) => {
+          ctx.body = 'test';
+          ctx.status = 200;
+        });
 
       const response = await router.resolve({
         request: {
@@ -250,22 +250,22 @@ describe('router', () => {
   describe('router exclude matching', () => {
     it('should not match on a excluded path', async () => {
       const router = new Router();
-      router.add(
-        {
-          path: '/.*',
-          excludePath: '/public',
-          method: ['GET'],
-        },
-        async (ctx) => {
-          ctx.status = 403;
-          ctx.body = 'Forbidden...`';
-        },
-      );
-
-      router.get('/.*', async (ctx) => {
-        ctx.body = 'test';
-        ctx.status = 200;
-      });
+      router
+        .add(
+          {
+            path: '/.*',
+            excludePath: '/public',
+            method: ['GET'],
+          },
+          async (ctx) => {
+            ctx.status = 403;
+            ctx.body = 'Forbidden...`';
+          },
+        )
+        .get('/.*', async (ctx) => {
+          ctx.body = 'test';
+          ctx.status = 200;
+        });
 
       const response = await router.resolve({
         request: {
@@ -396,15 +396,15 @@ describe('router', () => {
     it('should route fallback to the second route if the first does not match', async () => {
       const router = new Router();
 
-      router.get('/foo', async (ctx, next) => {
-        ctx.body = 'foo';
-        ctx.status = 200;
-      });
-
-      router.get('/bar', async (ctx) => {
-        ctx.body = 'bar';
-        ctx.status = 200;
-      });
+      router
+        .get('/foo', async (ctx, next) => {
+          ctx.body = 'foo';
+          ctx.status = 200;
+        })
+        .get('/bar', async (ctx) => {
+          ctx.body = 'bar';
+          ctx.status = 200;
+        });
 
       const response = await router.resolve({
         request: {
@@ -422,16 +422,16 @@ describe('router', () => {
     it('should fall through the first path if it calls next', async () => {
       const router = new Router();
 
-      router.get('/.*', async (ctx, next) => {
-        ctx.set('foo', 'bar');
+      router
+        .get('/.*', async (ctx, next) => {
+          ctx.set('foo', 'bar');
 
-        await next(ctx);
-      });
-
-      router.get('/hello', async (ctx) => {
-        ctx.body = 'test';
-        ctx.status = 200;
-      });
+          await next(ctx);
+        })
+        .get('/hello', async (ctx) => {
+          ctx.body = 'test';
+          ctx.status = 200;
+        });
 
       const request = new Request('http://test.example.com/hello');
 

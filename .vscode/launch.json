@@ -9,6 +9,14 @@
       "request": "launch",
       "name": "Launch Program",
       "program": "${workspaceFolder}/examples/local.js"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Tests",
+      "cwd": "${workspaceFolder}",
+      "program": "/home/bam/.nvm/versions/node/v14.13.0/bin/npm",
+      "args": ["run", "mocha"]
     }
   ]
 }

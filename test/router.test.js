@@ -501,4 +501,23 @@ describe('router header matching', () => {
 
     expect(response.status).to.equal(404);
   });
+
+  it('should serve static html', async () => {
+    const router = new Router();
+    router.use(responseUtils.serveStatic);
+
+    const request = {
+      url: 'http://foo.example.com/dummy.html',
+      method: constants.methods.GET,
+      headers: new Map(),
+    };
+
+    const response = await router.resolve({
+      request,
+    });
+
+    const body = await responseUtils.getBodyText(response.body)
+
+    expect(body).to.equal('<p>this is static html</p>');
+  });
 });
